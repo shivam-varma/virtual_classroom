@@ -1,7 +1,8 @@
-package com.virtualclassroom;
+package Com.virtualclassroom;
 
-import com.virtualclassroom.ui.RegisterFrame;
 import javax.swing.SwingUtilities;
+
+import Com.virtualclassroom.ui.RegisterFrame;
 
 public class Main {
     public static void main(String[] args) {

@@ -1,8 +1,10 @@
-package com.virtualclassroom.ui;
+package Com.virtualclassroom.ui;
 
 import javax.swing.*;
+
+import Com.virtualclassroom.model.User;
+
 import java.awt.*;
-import com.virtualclassroom.model.User;
 
 public class StudentDashboard extends JFrame {
 

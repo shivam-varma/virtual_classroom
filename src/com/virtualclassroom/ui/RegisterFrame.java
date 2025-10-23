@@ -1,11 +1,13 @@
-package com.virtualclassroom.ui;
+package Com.virtualclassroom.ui;
 
 import javax.swing.*;
+
+import Com.virtualclassroom.model.User;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.util.ArrayList;
-import com.virtualclassroom.model.User;
 
 public class RegisterFrame extends JFrame {
     private JTextField nameField, usernameField;

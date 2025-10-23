@@ -1,22 +1,33 @@
-package com.virtualclassroom.model;
+package Com.virtualclassroom.model;
 
-import java.io.Serializable;
-
-public class User implements Serializable {
-    private String name;
+public class User {
     private String username;
     private String password;
-    private String role; // "student" or "teacher"
+    private String role; // "Teacher" or "Student"
 
-    public User(String name, String username, String password, String role) {
-        this.name = name;
+    // ✅ Constructor that takes 3 parameters
+    public User(String username, String password, String role) {
         this.username = username;
         this.password = password;
         this.role = role;
     }
 
-    public String getName() { return name; }
-    public String getUsername() { return username; }
-    public String getPassword() { return password; }
-    public String getRole() { return role; }
+    // ✅ Getters
+    public String getUsername() {
+        return username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    // ✅ To display in JList or logs
+    @Override
+    public String toString() {
+        return username + " (" + role + ")";
+    }
 }
