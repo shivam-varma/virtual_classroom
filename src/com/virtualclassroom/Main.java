@@ -1,11 +1,9 @@
 package Com.virtualclassroom;
 
-import javax.swing.SwingUtilities;
-
-import Com.virtualclassroom.ui.RegisterFrame;
+import Com.virtualclassroom.ui.LoginFrame;
 
 public class Main {
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> new RegisterFrame());
+        new LoginFrame();
     }
 }

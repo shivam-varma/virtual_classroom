@@ -1,110 +1,79 @@
 package Com.virtualclassroom.ui;
 
 import javax.swing.*;
-
-import Com.virtualclassroom.model.User;
-
 import java.awt.*;
 import java.awt.event.*;
-import java.io.*;
-import java.util.ArrayList;
+import Com.virtualclassroom.data.UserManager;
+import Com.virtualclassroom.model.User;
 
 public class RegisterFrame extends JFrame {
     private JTextField nameField, usernameField;
     private JPasswordField passwordField;
     private JComboBox<String> roleBox;
-    private JButton registerButton, loginLinkButton;
+    private JButton registerButton, backButton;
 
     public RegisterFrame() {
-        setTitle("Virtual Classroom - Register");
-        setSize(400, 350);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setTitle("Register - Virtual Classroom");
+        setSize(400, 300);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
-        setResizable(false);
+        setLayout(new GridLayout(6, 2, 10, 10));
 
-        JPanel panel = new JPanel(new GridBagLayout());
-        panel.setBackground(new Color(255, 250, 240));
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(10, 10, 10, 10);
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-
-        // Fields
-        JLabel nameLabel = new JLabel("Name:");
-        gbc.gridx = 0; gbc.gridy = 0; panel.add(nameLabel, gbc);
-        nameField = new JTextField(15);
-        gbc.gridx = 1; gbc.gridy = 0; panel.add(nameField, gbc);
+        JLabel nameLabel = new JLabel("Full Name:");
+        nameField = new JTextField();
 
         JLabel usernameLabel = new JLabel("Username:");
-        gbc.gridx = 0; gbc.gridy = 1; panel.add(usernameLabel, gbc);
-        usernameField = new JTextField(15);
-        gbc.gridx = 1; gbc.gridy = 1; panel.add(usernameField, gbc);
+        usernameField = new JTextField();
 
-        JLabel passLabel = new JLabel("Password:");
-        gbc.gridx = 0; gbc.gridy = 2; panel.add(passLabel, gbc);
-        passwordField = new JPasswordField(15);
-        gbc.gridx = 1; gbc.gridy = 2; panel.add(passwordField, gbc);
+        JLabel passwordLabel = new JLabel("Password:");
+        passwordField = new JPasswordField();
 
         JLabel roleLabel = new JLabel("Role:");
-        gbc.gridx = 0; gbc.gridy = 3; panel.add(roleLabel, gbc);
-        roleBox = new JComboBox<>(new String[] {"student", "teacher"});
-        gbc.gridx = 1; gbc.gridy = 3; panel.add(roleBox, gbc);
+        roleBox = new JComboBox<>(new String[]{"Teacher", "Student"});
 
         registerButton = new JButton("Register");
-        gbc.gridx = 1; gbc.gridy = 4;
-        panel.add(registerButton, gbc);
+        backButton = new JButton("Back to Login");
 
-        loginLinkButton = new JButton("Already have an account? Login");
-        loginLinkButton.setBorderPainted(false);
-        loginLinkButton.setBackground(panel.getBackground());
-        loginLinkButton.setForeground(Color.BLUE);
-        gbc.gridx = 1; gbc.gridy = 5;
-        panel.add(loginLinkButton, gbc);
+        add(nameLabel);
+        add(nameField);
+        add(usernameLabel);
+        add(usernameField);
+        add(passwordLabel);
+        add(passwordField);
+        add(roleLabel);
+        add(roleBox);
+        add(registerButton);
+        add(backButton);
 
-        add(panel);
-        setVisible(true);
-
-        // Actions
         registerButton.addActionListener(e -> registerUser());
-        loginLinkButton.addActionListener(e -> {
+        backButton.addActionListener(e -> {
             dispose();
             new LoginFrame();
         });
+
+        setVisible(true);
     }
 
     private void registerUser() {
-        String name = nameField.getText();
-        String username = usernameField.getText();
-        String password = new String(passwordField.getPassword());
+        String name = nameField.getText().trim();
+        String username = usernameField.getText().trim();
+        String password = new String(passwordField.getPassword()).trim();
         String role = (String) roleBox.getSelectedItem();
 
         if (name.isEmpty() || username.isEmpty() || password.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "All fields are required!", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Please fill all fields!");
             return;
         }
 
-        try {
-            File file = new File("users.dat");
-            ArrayList<User> users = new ArrayList<>();
+        User newUser = new User(name, username, password, role);
+        boolean success = UserManager.registerUser(newUser);
 
-            if (file.exists()) {
-                ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file));
-                users = (ArrayList<User>) ois.readObject();
-                ois.close();
-            }
-
-            users.add(new User(name, username, password, role));
-
-            ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(file));
-            oos.writeObject(users);
-            oos.close();
-
-            JOptionPane.showMessageDialog(this, "Registration successful!");
+        if (success) {
+            JOptionPane.showMessageDialog(this, "Registration successful! You can now log in.");
             dispose();
             new LoginFrame();
-        } catch (Exception e) {
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Error saving user data.", "Error", JOptionPane.ERROR_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(this, "Username already exists!");
         }
     }
 }
-

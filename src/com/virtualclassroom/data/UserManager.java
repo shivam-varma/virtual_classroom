@@ -8,15 +8,13 @@ public class UserManager {
     private static final String FILE_PATH = "users.txt";
 
     public static boolean registerUser(User user) {
-        // Check if user already exists
         List<User> users = loadUsers();
         for (User u : users) {
             if (u.getUsername().equalsIgnoreCase(user.getUsername())) {
-                return false; // already exists
+                return false; // user already exists
             }
         }
 
-        // Save new user
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_PATH, true))) {
             writer.write(user.getUsername() + "," + user.getPassword() + "," + user.getRole());
             writer.newLine();
@@ -34,7 +32,7 @@ public class UserManager {
                 return u;
             }
         }
-        return null; // invalid credentials
+        return null;
     }
 
     public static List<User> loadUsers() {
@@ -56,4 +54,3 @@ public class UserManager {
         return users;
     }
 }
-

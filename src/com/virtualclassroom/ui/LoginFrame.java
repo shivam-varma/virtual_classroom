@@ -1,107 +1,67 @@
 package Com.virtualclassroom.ui;
 
-import javax.swing.*;
-
+import Com.virtualclassroom.data.UserManager;
 import Com.virtualclassroom.model.User;
-
+import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
-import java.io.*;
-import java.util.ArrayList;
 
 public class LoginFrame extends JFrame {
-
     private JTextField usernameField;
     private JPasswordField passwordField;
-    private JButton loginButton, registerButton;
 
     public LoginFrame() {
-        setTitle("Virtual Classroom - Login");
-        setSize(400, 300);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setTitle("Login - Virtual Classroom");
+        setSize(360, 220);
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
-        setResizable(false);
+        setLayout(new GridLayout(4, 2, 10, 10));
 
-        JPanel panel = new JPanel(new GridBagLayout());
-        panel.setBackground(new Color(240, 248, 255));
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(10, 10, 10, 10);
-        gbc.fill = GridBagConstraints.HORIZONTAL;
+        add(new JLabel("Username:"));
+        usernameField = new JTextField();
+        add(usernameField);
 
-        JLabel userLabel = new JLabel("Username:");
-        gbc.gridx = 0; gbc.gridy = 0; panel.add(userLabel, gbc);
-        usernameField = new JTextField(15);
-        gbc.gridx = 1; gbc.gridy = 0; panel.add(usernameField, gbc);
+        add(new JLabel("Password:"));
+        passwordField = new JPasswordField();
+        add(passwordField);
 
-        JLabel passLabel = new JLabel("Password:");
-        gbc.gridx = 0; gbc.gridy = 1; panel.add(passLabel, gbc);
-        passwordField = new JPasswordField(15);
-        gbc.gridx = 1; gbc.gridy = 1; panel.add(passwordField, gbc);
+        JButton loginButton = new JButton("Login");
+        JButton registerButton = new JButton("Register");
 
-        loginButton = new JButton("Login");
-        gbc.gridx = 1; gbc.gridy = 2; panel.add(loginButton, gbc);
+        add(loginButton);
+        add(registerButton);
 
-        registerButton = new JButton("New user? Register here");
-        registerButton.setBorderPainted(false);
-        registerButton.setBackground(panel.getBackground());
-        registerButton.setForeground(Color.BLUE);
-        gbc.gridx = 1; gbc.gridy = 3; panel.add(registerButton, gbc);
-
-        add(panel);
-        setVisible(true);
-
-        // Button actions
-        loginButton.addActionListener(e -> handleLogin());
+        loginButton.addActionListener(e -> loginUser());
         registerButton.addActionListener(e -> {
             dispose();
             new RegisterFrame();
         });
+
+        setVisible(true);
     }
 
-    private void handleLogin() {
-        String username = usernameField.getText();
-        String password = new String(passwordField.getPassword());
+    private void loginUser() {
+        String username = usernameField.getText().trim();
+        String password = new String(passwordField.getPassword()).trim();
 
         if (username.isEmpty() || password.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Please enter both fields!", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Please enter both username and password!", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
-        try {
-            File file = new File("users.dat");
-            if (!file.exists()) {
-                JOptionPane.showMessageDialog(this, "No users registered yet!", "Error", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
+        User u = UserManager.validateUser(username, password);
+        if (u == null) {
+            JOptionPane.showMessageDialog(this, "Invalid credentials", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
 
-            ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file));
-            ArrayList<User> users = (ArrayList<User>) ois.readObject();
-            ois.close();
+        JOptionPane.showMessageDialog(this, "Welcome, " + u.getName());
+        dispose();
 
-            boolean found = false;
-            for (User u : users) {
-                if (u.getUsername().equals(username) && u.getPassword().equals(password)) {
-                    found = true;
-                    JOptionPane.showMessageDialog(this, "Welcome " + u.getName() + "! Logged in as " + u.getRole());
-                    dispose();
-
-                    // Role-based navigation (we'll make these next)
-                    if (u.getRole().equalsIgnoreCase("teacher")) {
-                        new TeacherDashboard(u);
-                    } else {
-                        new StudentDashboard(u);
-                    }
-                    break;
-                }
-            }
-
-            if (!found) {
-                JOptionPane.showMessageDialog(this, "Invalid credentials!", "Error", JOptionPane.ERROR_MESSAGE);
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Error reading user data.", "Error", JOptionPane.ERROR_MESSAGE);
+        // Make sure TeacherDashboard and StudentDashboard have constructors that accept User
+        if ("teacher".equalsIgnoreCase(u.getRole())) {
+            new TeacherDashboard(u);
+        } else {
+            new StudentDashboard(u);
         }
     }
 }
